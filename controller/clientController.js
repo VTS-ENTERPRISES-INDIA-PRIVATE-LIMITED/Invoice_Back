@@ -1,14 +1,14 @@
 const connection = require('../db/connection');
 
 const createClient = (req, res) => {
-    const { company_name, email, phone } = req.body;
-    const userId = req.userId;
-    if(!company_name || !email || !phone)
+    const { first_name, last_name, company_name, email, country, address, postal, city, phone, image_url } = req.body;
+    const user_id = req.userId;
+    if(!company_name || !email || !phone || !city || !postal || !address || !country || !last_name || !first_name || !image_url)
     {
         return res.status(400).send({error: "All the fields are required..."});
     }
-    const query = `INSERT INTO client(company_name, email, phone, user_id) VALUES (?, ?, ?, ?);`;
-    connection.execute(query, [company_name, email, phone, userId], (err, result) => {
+    const query = `INSERT INTO client(first_name, last_name, company_name, email, country, address, postal, city, phone, image_url, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    connection.execute(query, [first_name, last_name, company_name, email, country, address, postal, city, phone, image_url, user_id], (err, result) => {
         if(err)
         {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -27,10 +27,11 @@ const createClient = (req, res) => {
 
 const getClients = (req, res) => {
     const userId = req.userId;
-    const query = `SELECT client.client_id, client.company_name, client.email, client.phone, client.date_of_created FROM client JOIN user ON client.user_id = user.user_id WHERE user.user_id = ?;`;
+    const query = `SELECT client.first_name, client.last_name,  client.country, client.address, client.postal, client.city, client.client_id, client.company_name, client.email, client.phone, client.image_url, client.date_of_created FROM client JOIN user ON client.user_id = user.user_id WHERE user.user_id = ?;`;
     connection.execute(query, [userId], (err, result) => {
         if(err)
         {
+            console.log(err);
             return res.status(500).send({error: "Internal Server error.."});
         }
         if(result.affectedRows === 0)
@@ -42,23 +43,24 @@ const getClients = (req, res) => {
 }
 
 const updateClient = (req, res) => {
-    const {company_name, email, phone} = req.body;
+    const {first_name, last_name, company_name, email, country, address, postal, city, phone, image_url} = req.body;
     const user_id = req.userId;
-    if(!company_name || !email || !phone)
+    if(!company_name || !email || !phone || !city || !postal || !address || !country || !last_name || !first_name || !image_url)
     {
         return res.status(400).send({error: "All the fields are required..."});
     }
-    const query = `UPDATE client set company_name = ?, phone = ? where email = ? AND user_id = ?;`;
-    connection.execute(query, [company_name, phone, email, user_id], (err, result) => {
+    const query = `UPDATE client set first_name = ? , last_name = ?, company_name = ?, address = ?, postal = ?, city = ?, phone = ?,  postal = ?, image_url = ? where email = ? AND user_id = ?;`;
+    connection.execute(query, [first_name, last_name, company_name, country, address, city, phone, postal, image_url, email, user_id], (err, result) => {
         if(err)
         {
+            console.log(err);
             return res.status(500).send({error: "Internal Server error..."});
         }
-        if(result === 0)
+        if(result.affectedRows === 0)
         {
             return res.status(400).send({error: "Error while updating the data."});
         }
-        return res.status(201).send({message: "Data update.", clientId: result.insertId});
+        return res.status(200).send({message: "Data update.", clientId: result.insertId});
     })
 }
 

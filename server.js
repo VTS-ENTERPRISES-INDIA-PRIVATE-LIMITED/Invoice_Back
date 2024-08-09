@@ -26,8 +26,8 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-   //dropTable('invoices');
-  //  dropTable('client');
+  //dropTable('invoices');
+  //dropTable('client');
   //  dropTable("user");
   userTable();
   clientTable();
