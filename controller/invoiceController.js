@@ -39,6 +39,19 @@ const getAllInvoices = (req, res) => {
     });
 };
 
+const getAllInvoicess = (req, res) => {
+    const query = `SELECT * FROM invoice;`;
+    connection.execute(query, (err, result) => {
+        if(err)
+        {
+            console.log(err);
+            return res.status(500).send({error: "Internal server errror..."});
+            
+        }
+        res.status(200).send(result);
+    })
+}
+
 // // Controller to retrieve an invoice by client name
 // const getInvoiceByClientName = (req, res) => {
 //     const { client_name } = req.params;
@@ -106,4 +119,4 @@ const getAllInvoices = (req, res) => {
 //     });
 // }
 
-module.exports = { createInvoice, getAllInvoices };
+module.exports = { createInvoice, getAllInvoices, getAllInvoicess };
